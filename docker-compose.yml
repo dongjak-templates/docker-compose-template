@@ -34,7 +34,7 @@ services:
     image: caddy
     restart: unless-stopped
     environment:
-      - TZ=Asia/Shanghai
+      <<: *shared-env
     ports:
       - "80:80"
       - "443:443"
