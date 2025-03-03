@@ -1,6 +1,7 @@
 x-shared-env: &shared-env
   TZ: ${TZ:-Asia/Shanghai}
-
+x-api-env: &api-env
+  TZ: ${TZ:-Asia/Shanghai}
 services:
   db:
     image: postgres
@@ -43,6 +44,19 @@ services:
       - ./gateway/.certificates:/data/caddy/certificates
     networks:
       - default
+  python-api:
+    image: python-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      <<: *api-env
+    depends_on:
+      - db
+    networks:
+      - default
+    volumes:
+      - ./api/logs:/app/logs
   dockge:
     image: louislam/dockge:1
     restart: unless-stopped
