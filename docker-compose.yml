@@ -15,7 +15,7 @@ services:
     ports:
       - "${POSTGRES_EXPOSE_PORT}:5432"
     networks:
-      - ${NETWORK_NAME}
+      - default
     restart: unless-stopped
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
@@ -29,7 +29,7 @@ services:
     ports:
       - "${REDIS_EXPOSE_PORT}:6379"
     networks:
-      - ${NETWORK_NAME}
+      - default
   gateway:
     image: caddy
     restart: unless-stopped
@@ -42,7 +42,7 @@ services:
       - ./gateway/Caddyfile:/etc/caddy/Caddyfile
       - ./gateway/.certificates:/data/caddy/certificates
     networks:
-      - ${NETWORK_NAME}
+      - default
   dockge:
     image: louislam/dockge:1
     restart: unless-stopped
@@ -60,7 +60,7 @@ services:
       # Tell Dockge where to find the stacks
       - DOCKGE_STACKS_DIR=/opt/stacks
     networks:
-      - ${NETWORK_NAME}
+      - default
 networks:
-  ${NETWORK_NAME}:
+  default:
     driver: bridge
