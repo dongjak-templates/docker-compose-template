@@ -1,0 +1,11 @@
+dify.newbizai.cn {
+    reverse_proxy 49.128.218.223:1801
+    tls cruldra@gmail.com
+}
+
+http://crawler2.cruldra.cn {
+	tls cruldra@gmail.com
+	reverse_proxy 49.128.218.223:8007 {
+		header_up X-Forwarded-For {remote_host}
+	}
+}
