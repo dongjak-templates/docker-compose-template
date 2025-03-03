@@ -1,19 +1,21 @@
-version: '3.8'
+x-shared-env: &shared-env
+  TZ: ${TZ:-Asia/Shanghai}
 
 services:
   db:
     image: postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: aq
+      <<: *shared-env
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB}
       PGDATA: /data/postgres
     volumes:
-      - ./db/data:/data/postgres
+      - ${POSTGRES_DATA_DIR}:/data/postgres
     ports:
-      - "5432:5432"
+      - "${POSTGRES_EXPOSE_PORT}:5432"
     networks:
-      - aq
+      - ${NETWORK_NAME}
     restart: unless-stopped
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
@@ -23,11 +25,11 @@ services:
   redis:
     image: redis
     restart: always
-    command: redis-server --requirepass 123394 --bind 0.0.0.0 -::*
+    command: redis-server --requirepass ${REDIS_PASSWORD} --bind 0.0.0.0 -::*
     ports:
-      - "6379:6379"
+      - "${REDIS_EXPOSE_PORT}:6379"
     networks:
-      - aq
+      - ${NETWORK_NAME}
   gateway:
     image: caddy
     restart: unless-stopped
@@ -40,7 +42,7 @@ services:
       - ./gateway/Caddyfile:/etc/caddy/Caddyfile
       - ./gateway/.certificates:/data/caddy/certificates
     networks:
-      - aq
+      - ${NETWORK_NAME}
   dockge:
     image: louislam/dockge:1
     restart: unless-stopped
@@ -57,6 +59,8 @@ services:
     environment:
       # Tell Dockge where to find the stacks
       - DOCKGE_STACKS_DIR=/opt/stacks
+    networks:
+      - ${NETWORK_NAME}
 networks:
-  aq:
+  ${NETWORK_NAME}:
     driver: bridge
